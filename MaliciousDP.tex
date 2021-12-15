@@ -1,7 +1,5 @@
 \def\IsDraft{} % set for draft version
 
-
-
 \documentclass[11pt]{article}
 \usepackage{amsfonts,amsmath,amssymb,amsthm,boxedminipage,color,url,fullpage}
 \usepackage{enumerate,paralist}
@@ -19,161 +17,30 @@
 \floatstyle{boxed}
 \restylefloat{figure}
 
-
-\renewcommand{\pi}{ \Pi }
-
 \input{macros}
 
-\renewcommand{\Cc}{\mathsf{D}}
-\renewcommand{\I}{\mathcal{K}}
-
-\renewcommand{\b}{\mathbf{b}}
-\renewcommand{\P}{\mathcal{P}}
-\newcommand{\gv}{\mathsf{gv}} 
-\renewcommand{\d}{\mathsf{def}}
-\newcommand{\gap}{\mathsf{gap}}
-\newcommand{\jump}{\mathsf{jump}}
-\newcommand{\noise}{\mathsf{noise}}
-
-\newcommand{\aug}[1]{\mathsf{aug}\left(#1\right)}
-\newcommand{\tpprot}[2]{\left( #1,#2\right)}
-\newcommand{\tpi}{\wt{\pi}}
-\newcommand{\tAc}{\wt{\Ac}}
-\newcommand{\tBc}{\wt{\Bc}}
-\newcommand{\advJ}{\wt{J}}
-\newcommand{\rmv}[1]{\setminus  #1 }
-\newcommand{\err}{\mathsf{err}}
-\newcommand{\Biased}{{\mathcal{N}\!\mathsf{on\mathcal{S}imilar}}}
-\newcommand{\Unbiased}{{\mathcal{S}\mathsf{imilar}}}
-\def\arraystretch{1.5}
-
-\renewcommand{\k}{\mathbf{k}} 
-\renewcommand{\g}{\mathbf{g}}
 %\newcommand{\gv}{\mathbf{gv}} 
 
-\newcommand{\np}{n}
-
-\newcommand{\hp}{\chi}
-\newcommand{\GvAttack}{\mathsf{MartAttack}}
-\newcommand{\DpAttack}{\mathsf{DpAttack}}
-\newcommand{\ApproxAttack}{\mathsf{SingAttack}}
-\newcommand{\csZ}{\cs^{(0)}} 
-\newcommand{\csO}{\cs^{(1)}} 
-\newcommand{\uni}{\mathsf{uni}} 
-\newcommand{\sx}{{\textbf{x}}}
-\newcommand{\aux}{{\mathsf{aux}}}
-\newcommand{\hist}{{\mathsf{agt}}}
-
-
-\newcommand{\backup}{\mathsf{Bckp}}
-\newcommand{\AvgBackup}{\mathsf{AvgBckp}}
-\newcommand{\cn}{\mathcal{P}} 
-\newcommand{\cQ}{\mathcal{Q}} 
-\newcommand{\adv}{\mathsf{adv}}
-\newcommand{\nug}{\mathsf{nug}}
 %\newcommand{\adv}{\mathsf{adv}}
-\newcommand{\trigg}{\mathsf{trig}} 
-\newcommand{\backupY}{backup ratio}
-\newcommand{\coef}[1]{\mathsf{coef}_{\np}(k,#1)}
-\newcommand{\bp}{\mathbf{p}} 
-\newcommand{\enc}{{\mathsf{enc}}} 
-\newcommand{\ks}{{k^\ast}}
-\newcommand{\bS}{{\mathbb{S}}}
-\newcommand{\bE}{{\mathbb{E}}}
-
-\newcommand{\Ng}{{\mathsf{ng}}}
-\newcommand{\NGG}{{\mathsf{NG}}}
-%\newcommand{\hist}{{\mathsf{agt}}}
-\newcommand{\sg}{{\mathsf{sg}}}
-\newcommand{\Sg}{{\mathsf{Sg}}}
-%\newcommand{\aux}{{\mathsf{aux}}}
-\newcommand{\Aux}{{\mathsf{Aux}}}
-%\newcommand{\sx}{{\textbf{x}}}
-\newcommand{\mgap}{{\mathsf{mgap}}}
-\newcommand{\dep}{{\mathsf{depart}}}
-
-\newcommand{\sgn}{{\mathsf{sgn}}}
-
-
-\newcommand{\LapExp}{\mathsf{LapExp}}
-\newcommand{\LapExpGen}{\mathsf{LapExpGen}}
-\newcommand{\mh}{{\setminus h}}
-\newcommand{\mH}{{\setminus H}}
-\newcommand{\tsh}{\mathsf{tsh}}
-
-\newcommand{\K}{\mathcal{K}}
-\newcommand{\rand}{s}
-
-\newcommand{\scheck}{\mathsf{BadBackupAttack}}
-\newcommand{\ciattack}{\mathsf{CI}\_\mathsf{Attack}}
-
-\newcommand{\dc}{\mathsf{Dcr}}
-\newcommand{\wdc}{\mathsf{D}\wt{\mathsf{c}}\mathsf{r}}
-\newcommand{\di}{\mathsf{D}}
-\newcommand{\wPi}{\wt{\pi}}
-\newcommand{\Gap}{G^{\mathsf{ap}}}
-\newcommand{\wh}[1]{\widehat{#1}}
-\newcommand{\hPi}{\widehat{\pi}}
-\newcommand{\hAc}{\widehat{\Ac}}
-\newcommand{\hBc}{\widehat{\Bc}}
-\newcommand{\cnt}{\mathsf{cnt}}
-\newcommand{\hdc}{\mathsf{D}\wh{\mathsf{c}}\mathsf{r}}
-
-\newcommand{\allg}{\mathsf{Alg}}
-\newcommand{\wllg}{\mathsf{A}\wt{\mathsf{l}}\mathsf{g}}
-
-\newcommand{\party}{b}	
-\newcommand{\bj}{{1-\party}}
-
-
-%use this maros in the main file
-\newcommand{\Dcr}{\MathAlgX{Dcr}}
-\newcommand{\tDcr}{\MathAlgX{\widetilde{\Dcr}}}
-\newcommand{\tFc}{\MathAlgX{\widetilde{\Fc}}}
-\newcommand{\hDcr}{\Dcr}
-
-\newcommand{\tPi}{\widetilde{\pi}}
-\newcommand{\htPi}{\widehat{\pi}}
-\newcommand{\buInd}[2]{Z_{#2}^{#1}}
-\newcommand{\buAi}{\buInd{\Ac}{i}}
-\newcommand{\buBi}{\buInd{\Bc}{i}}
-\newcommand{\buAr}{\buInd{\Ac}{r}}
-\newcommand{\buBr}{\buInd{\Bc}{r}}
-
-\newcommand{\hbuInd}[2]{{Z}_{#2}^{\wh{#1}}}
-\newcommand{\hbuAi}{\hbuInd{\Ac}{i}}
-\newcommand{\hbuBi}{\hbuInd{\Bc}{i}}
-\newcommand{\hbuAr}{\hbuInd{\Ac}{r}}
-
-\newcommand{\tran}[1]{T_{#1}}
-\newcommand{\trani}{\tran{i}}
-\newcommand{\tranr}{\tran{r}}
-\newcommand{\tranj}{\tran{j}}
-\newcommand{\su}{\subseteq}
-
-\newcommand{\Ec}{\MathAlgX{Eve}}
-\newcommand{\secParam}{\kappa}
-\newcommand{\II}{\mathcal{I}}
 
 \newcommand{\pk}{\secParam}
 \newcommand{\Po}{\overline{\Pc}}
 
 %\newcommand{\pk}{\kappa}
-\newcommand{\Inote}[1]{\authnote{Iftach}{#1}}
-\newcommand{\Nnote}[1]{\authnote{Nikos}{#1}}
+\newcommand{\Knote}[1]{\authnote{Kobbi}{#1}}
+\newcommand{\Anote}[1]{\authnote{Amos}{#1}}
 \newcommand{\Enote}[1]{\authnote{Eran}{#1}}
-\newcommand{\inote}{\Inote}
+\newcommand{\Mnote}[1]{\authnote{Muthu}{#1}}
+\newcommand{\Unote}[1]{\authnote{Uri}{#1}}
+\newcommand{\knote}{\Knote}
 \newcommand{\nnote}{\Nnote}
-\newcommand{\enote}{\Enote}
+\newcommand{\anote}{\Anote}
+\newcommand{\mnote}{\Mnote}
+\newcommand{\unote}{\Unote}
 
-
-
-\title{Malicious DP via an alternative paradigm for defining security\Draft{\\{\small \sc Working Draft: Please Do Not Distribute}}}
+\title{Malicious DP via an alternative paradigm for defining security\Draft{\\{\small \sc Working Draft: Please Please Please Do Not Distribute}}}
 \author{}
- 
- 
- 
- 
+
 \begin{document}
 	\sloppy
 	  \maketitle
@@ -181,9 +48,79 @@
 \begin{abstract}
 \end{abstract}
 
-\Tableofcontents
+% \Tableofcontents
 
+\section{A framework for defining security wrt malicious parties}
 
+\subsection{Preliminary definitions}
+
+\subsubsection{Tasks} 
+
+We define a task $T$ by specifying a relation $R_T$, containing pairs $(x,{\cal D})$ where $x=(x_1,\ldots,x_n)$ is a potential input vector and ${\cal D}$ is a distribution over output vectors. A pair $(x,{\cal D})$ is in the relation if the distribution ${\cal D}$ is a suitable output distribution for the input $x$.
+
+We identify the security parameter the number of agents $n$. 
+With  we let the input and output domains, both denoted $X$, be $n$-bit strings, i.e., $X=\{0,1\}^n$.
+
+A task is defined by specifying for each joint input which joint output distributions are appropriate.
+\begin{definition}[Task] A task $T$ with $n$ inputs and $n$ outputs is defined by a relation
+$$R_T\subseteq X^n \times \Delta\left(X^n\right).$$
+\end{definition}
+
+\begin{example}
+\begin{enumerate}
+    \item Computing a function: To define the task $T_f$ of computing the (deterministic) $f:X^n \rightarrow X^n$ define the relation
+    $$R_{T_f} = \{(x,{\cal D}_{f(x)}) | x\in X^n\}, $$
+    where ${\cal D}_{f(x)}$ is the distribution over $X^n$ which points a point mass on $f(x)$ and zero mass elsewhere.
+    
+    \item An approximating a function: To define the task $T_{\approx f}$ of approximating the function $f$ up to additive error $\alpha$ with error probability $\beta$ define the relation 
+    $$R_{T_{\approx f}} = \{(x,{\cal D}) | x\in X^n \wedge \Pr_{y\sim {\cal D}} \left[\forall i\in [n]\;|y_i-f(x)_i|\leq \alpha\right] \geq 1-\beta\}.$$
+    That is, if $(x,{\cal D}\in R_{T_{\approx f}}$ then a sample from the distribution ${\cal D}$ returns with probability at least $1-\beta$ an estimate of $f(x)$ up to additive error $\alpha$.
+    
+    \item A search problem:
+\end{enumerate}
+\end{example}
+
+\subsubsection{Protocols solving a task} 
+
+Let $\Pi$ be a protocol and let $x=(x_1,\ldots,x_n)\in X^n$. The output of executing $\Pi$ on input $x$ is the content $o=(o_1,\ldots,o_n)\in X^n$ of the parties' local outputs at the end of the execution. We use $\Pi(x)$ to denote both the random variable corresponding to the outputs of the protocol and to denote its distribution.
+
+\begin{definition}[Protocol solving a task]
+
+A protocol $\Pi$ solves task $T$ if for all inputs $x=(x_1,\ldots,x_n)\in X^n$,
+$$(x,\Pi(x))\in R_T.$$
+\end{definition}
+
+\knote{give a couple of examples}
+
+\subsubsection{$S$-security}
+
+\subsubsection{Simulation of augmented semi-honest executions}
+
+\subsection{The framework}
+
+We now present a framework for lifting $S$-security from the augmented semi-honest model to the malicious model.
+
+\begin{definition}[Framework, informal]
+A protocol $\Pi$ is maliciously $S$-secure for task $T$ if the following holds:
+\begin{enumerate}
+    \item Honest execution of protocol $\Pi$ solves task $T$.
+    \item Augmented semi-honest execution of $\Pi$ is $S$-secure.
+    \item Malicious execution of $\Pi$ is simulatable from the augmented semi-honest execution.
+\end{enumerate}
+
+\subsection{instantiations of the framework}
+
+\subsubsection{Malicious MPC}
+
+\subsubsection{Malicious DP}
+
+\subsubsection{$1/p$-security}
+
+\subsubsection{private approximations}
+
+\subsection{Composition}
+
+\end{definition}
 
 
 
