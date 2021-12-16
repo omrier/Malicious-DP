@@ -69,14 +69,14 @@ $$R_T\subseteq X^n \times \Delta\left(X^n\right).$$
 \begin{example}
 \begin{enumerate}
     \item Computing a function: To define the task $T_f$ of computing the (deterministic) $f:X^n \rightarrow X^n$ define the relation
-    $$R_{T_f} = \{(x,{\cal D}_{f(x)}) | x\in X^n\}, $$
+    $$R_{T_f} = \left\{(x,{\cal D}_{f(x)}) | x\in X^n\right\}, $$
     where ${\cal D}_{f(x)}$ is the distribution over $X^n$ which points a point mass on $f(x)$ and zero mass elsewhere.
     
     \item An approximating a function: To define the task $T_{\approx f}$ of approximating the function $f$ up to additive error $\alpha$ with error probability $\beta$ define the relation 
-    $$R_{T_{\approx f}} = \{(x,{\cal D}) | x\in X^n \wedge \Pr_{y\sim {\cal D}} \left[\forall i\in [n]\;|y_i-f(x)_i|\leq \alpha\right] \geq 1-\beta\}.$$
-    That is, if $(x,{\cal D}\in R_{T_{\approx f}}$ then a sample from the distribution ${\cal D}$ returns with probability at least $1-\beta$ an estimate of $f(x)$ up to additive error $\alpha$.
+    $$R_{T_{\approx f}} = \left\{(x,{\cal D}) | x\in X^n \wedge \Pr_{y\sim {\cal D}} \left[\max_{i\in[n]} |y_i-f(x)_i| > \alpha\right] < \beta\right\}.$$
+    That is, if $(x,{\cal D}) \in R_{T_{\approx f}}$ then a sample from the distribution ${\cal D}$ returns with probability at least $1-\beta$ an estimate of $f(x)$ up to additive error $\alpha$.
     
-    \item A search problem:
+    \item A search problem: 
 \end{enumerate}
 \end{example}
 
@@ -92,9 +92,9 @@ $$(x,\Pi(x))\in R_T.$$
 
 \knote{give a couple of examples}
 
-\subsubsection{$S$-security}
+\subsubsection{$S$-security of augmented semi-honest protocols}
 
-\subsubsection{Simulation of augmented semi-honest executions}
+\subsubsection{Simulation of augmented semi-honest executions in the malicious model}
 
 \subsection{The framework}
 
