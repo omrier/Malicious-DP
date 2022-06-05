@@ -1,0 +1,316 @@
+\section{One round MPC from Pair-Shuffler}
+\begin{definition}[pair shuffler]\label{def:pshuffler}
+The pair shuffler functionality receives as inputs two ordered sequences of $\ell$ messages $\seq{a_1, \ldots, a_\ell}$ and $\seq{b_1, \ldots, b_\ell}$, and outputs $\seq{\seq{a_{\pi(1)},b_{\pi(1)}}, \ldots, \seq{a_{\pi(\ell)},b_{\pi(\ell)}}}$ where $\pi:[\ell]\rightarrow [\ell]$ is a uniformly random permutation of $[\ell]$. 
+\end{definition}
+
+\begin{definition}[$\F_{\pshuff}$ Hybrid Model]
+In the $\F_{\pshuff}$-hybrid model parties can communicate with each other as in the real world, and in addition, they have access to the pair shuffler functionality $\F_{\pshuff}$ (as in \cref{def:pshuffler}). 
+\end{definition}
+
+\subsection{A Single-Round Protocol for any Function in the $\F_{\pshuff}$ Hybrid Model}\label{sec:genMPC}
+
+Consider a setting, where two parties $\Ac$  and $\Bc$ with respective private inputs $x\in\X$ and $y\in\Y$ wish to compute a deterministic Boolean function $f$ over their inputs.
+We show how this can be done in the $\F_{\pshuff}$ Hybrid Model. Intuitively, we let party $\Bc$ prepare a truth table $f(\cdot,y)$ while party $\Ac$ selects position $x$ in the truth table. In \cref{sec:multi-genMPC}, we generalize the discussion to a sequence of (possibly randomized) functions.
+
+\begin{protocol}\label{prot:AnyFunction} [Two-party, deterministic function, single-round protocol in the $\F_{\pshuff}$ Hybrid Model]\label{prot:2psm}\
+\begin{description}
+\item[Inputs:]  Parties $\Ac$ and $\Bc$ hold private inputs $x\in\X$ and $y\in\Y$, respectively. Both hold a description of the function $f\colon \X\times\Y\mapsto\zo$ as their common input. Without loss of generalization, assume $\X=[\size{\X}]$.
+
+\item[Description:]\
+
+\begin{enumerate}
+\item Party $\Ac$ provides $\F_{\pshuff}$ with a sequence of  $2\size{\X}$ Boolean messages $(a_1, \ldots, a_{2\size{\X}})$, where $a_x=1$ and $a_j=0$ for all $j\neq x$.
+
+\item Party $\Bc$ provides $\F_{\pshuff}$ with a sequence of $2\size{\X}$ Boolean messages $(b_1, \ldots, b_{2\size{\X}})$, where $b_j=f(j,y)$ for all $j\leq \size{\X}$, and $b_j=1-f(j-\size{\X},y)$ for all $j> \size{\X}$. 
+%\label{step:halt}
+\end{enumerate}
+\item[Output:] The output of the computation is the value $\rho$, for the (unique) pair $(\sigma,\rho)$ with $\sigma = 1$.
+\end{description}
+\end{protocol}
+
+\begin{lemma}\label{lem:2psm}
+For any deterministic Boolean function $f\colon \X\times\Y\mapsto\zo$, \cref{prot:2psm} is a  single-round protocol that securely computes $f$ in the presence of semi-honest adversaries. %In addition, the number of bits each party sends in any execution of the protocol is exactly $2\cdot r\cdot\size{\X}$, where $r$ is the number of random coins required for computing $f$.
+\end{lemma}
+
+\begin{proof}
+To prove the lemma, we first show that the computation is correct. Note that, by construction,  the only pair $\seq{\sigma,\rho}$ for which $\sigma = 1$ is the pair that is the concatenation of the $x$'th message of $\Ac$ with the $x$'th message
+of $\Bc$. Thus, it holds that $\rho = f(x,y)$.
+
+Second, we show that for an adversary $\adv$ corrupting one of the parties, there exists a simulator, which given the correct output 
+% $\seq{z_1, \ldots, z_l}$, such that, 
+$z = f(x,y)$ can simulate the view of the adversary $\adv$ in an execution of the protocol. 
+We show that the output of the pair-shuffle can be simulated given only $z$ (i.e., even without knowing the input of the corrupted party). Observe that the sequence of message pairs, output by the shuffler, contains exactly the following message pairs: (i)  $\size{\X}-1$ pairs of the form $\seq{0,1}$, (ii)  $\size{\X}-1$ pairs of the form $\seq{ 0,0}$, (iii)  a single message of the form $\seq{ 1,z_i}$, and (iv)  a single message of the form $\seq{ 0,1-z_i}$. This is true because for every $1\le j \le\size{\X}$, if the message sent by $\Ac$ for the $j$'th message was $0$ (i.e., $x_i\neq j$) and the message sent by $\Bc$ for the $j$'th message was $\hat{\rho}$, then for the message $\size{\X}+j$, it holds that $\Ac$ sent $0$ and $\Bc$ sent $1-\hat{\rho}$. In addition, for the message $\size{\X}+x$, it holds that $\Ac$ sent $0$ and $\Bc$ sent $1-z$. 
+
+Hence, the simulator needs to select the messages as specified above, and select a uniformly random permutation over all messages. In addition, the simulator outputs the input and auxiliary input of the adversary, which are given to the simulator for the simulation process.
+\end{proof}
+
+
+
+\subsection{A Single-Round Protocol for a Sequence of (Possibly Randomized) Functions in the $\F_{\pshuff}$ Hybrid Model}\label{sec:multi-genMPC}
+\cref{prot:AnyFunction} allows two parties compute one Boolean deterministic function $f$ over their inputs. Using standard techniques, the result can be extended to computing a number of (randomized, not necessarily Boolean) functions  over the parties inputs, in a single round, as in \cref{prot:multi2psm} below. 
+
+%non-Boolean deterministic functions, it is natural to compute each output bit separately. For random functions $F(x,y; r)$ we use the standard solution of computing $f((x,r_\Ac),(y,r_\Bc))=F(x,y; r_\Ac\oplus r_\Bc)$ where parties $\Ac,\Bc$ select random $r_\Ac,r_\Bc$ respectively.
+
+%Furthermore, it is sometimes desirable to compute several different functions together. Fortunately, we show that in the semi-honest setting, \cref{prot:2psm} readily extends to a single-round protocol for computing a sequence of predetermined Boolean functions.  
+
+\begin{protocol} [Two-party, multi-function, single-round protocol in the $\F_{\pshuff}$ Hybrid Model]\label{prot:multi2psm}\
+\begin{description}
+\item[Inputs:]  Parties $\Ac$ and $\Bc$ hold private inputs $x_1\in\X_1, \ldots, x_{\ell}\in\X_{\ell}$ and $y_1\in\Y_1, \ldots, y_{\ell}\in\Y_{\ell}$, respectively. Both hold descriptions of the functions $f_1\colon \X_1\times\Y_1\times R_1\mapsto \zo, \ldots, f_1\colon \X_{\ell}\times\Y_{\ell}\times R_{\ell}\mapsto \zo$ as their common inputs (where $R_i=\zo^{s_i}$ is the domain of random coins used for computing $f_i$). Without loss of generalization, assume that $\X_i = [\size{\X_i}]$ and $\Y_i = [\size{\Y_i}]$ for every $i\in [\ell]$.
+
+\item[Correlating Random Coins:]
+To allow parties to compute random non-Boolean functions, the sampling of random coins for subsets $\sset{f_i}_{i\in S}$ for some $S\subseteq[\ell]$ may be correlated. It must hold, however, that it is possible to sample all random coins $r_1,\ldots, r_{\ell}$ for $f_1,\ldots, f_{\ell}$, respectively, by sampling the  sequence $r_1^{\Ac},\ldots, r_{\ell}^{\Ac}$ and independently  the  sequence $r_1^{\Bc},\ldots, r_{\ell}^{\Bc}$, and setting $r_i = r_i^{\Ac}\xor r_i^{\Bc}$ for all $i\in[\ell]$.\footnote{By way of example, we will later use this protocol to compute a sequence of functions that all use the same low locality PRG. In the background all functions will use the same PRG key, but each of them requires only a constant number of bits from this key.}
+\item[Description:]
+Both parties send $\ell$ blocks of messages, where the $i$'th block is of length $2\cdot\size{R_i}\cdot\size{\X_i}$, and is attributed to the computation of $f_i$. We stress that the shuffling permutes all messages, regardless of their attributed blocks.
+\begin{enumerate}
+\item  Party $\Ac$ samples the  sequence $(r_1^{\Ac},\ldots, r_{\ell}^{\Ac})$ according to the described correlation, \knote{what does this mean?} \enote{This relates to the paragraph above "Correlated Random Coins". If it is not clear enough, I'll try making it clearer. I wanted to leave it more general than just for the case of relating several Boolean outputs to a single -- non-Boolean function.} and party $\Bc$ (independently) samples the  sequence $(r_1^{\Bc},\ldots, r_{\ell}^{\Bc})$, again, according to the described correlation.
+
+\item For each function $f_i$, party $\Ac$ provides $\F_{\pshuff}$ with a sequence of  $2\cdot\size{R_i}\cdot\size{\X_i}$ Boolean messages $a^i_{1,0^{s_i}}, \ldots,a^i_{1,1^{s_i}}, \ldots a^i_{2\size{\X_i},0^{s_i}}, \ldots, a^i_{2\size{\X_i},1^{s_i}})$, where $a_{x_i,r_i}=1$ and $a_j=0$ for all $j\neq x_i$. \knote{could not follow the indices}
+
+\item For each function $f_i$, party $\Bc$ provides $\F_{\pshuff}$ with a sequence of  $2\cdot\size{R_i}\cdot\size{\X_i}$ messages $$\seq{\seq{i,b^i_{1,0^{s_i}}},  \ldots,\seq{i,b^i_{1,1^{s_i}}}, \ldots, \seq{i,b^i_{2\size{\X_i},0^{s_i}}}, \ldots, \seq{i,b^i_{2\size{\X_i,1^{s_i}}}}},$$ 
+where
+$ b^i_{j,r}=
+\begin{cases}
+f_i(j,y_i;r\xor r_i^{\Bc}) & \text{ if } j\leq \size{\X_i}, and\\
+1-f_i(j-\size{\X_i},y;r\xor r_i^{\Bc})  & \text{ if } j> \size{\X_i}.
+\end{cases}$ 
+%\label{step:halt}
+\end{enumerate}
+\item[Output:] The output of the computation is the sequence of values $\seq{\rho_1, \ldots, \rho_{\ell}}$, such that each $\rho_i$ comes from the (unique) pair $\seq{ \sigma_i,\seq{i,\rho_i}}$ with $\sigma_i = 1$.
+\end{description}
+\end{protocol}
+
+
+\begin{theorem}\label{thm:multi2psm}
+Let  
+$\seq{g_1\colon\X_1\times\Y_1\times R_1\mapsto\zo^{m_1}, \ldots, g_{\NBfs}\colon \X_{\NBfs}\times\Y_{\NBfs}\times R_{\NBfs}\mapsto\zo^{m_{\NBfs}}}$ be a sequence of (possibly randomized)  functions, such that, for every $i\in [t], j\in[m_i]$ the $j$'th output bit of $g_i(x_i,y_i;r_i)$ depends on at most $\alpha_{i,j}$ bits of $x_i$ and at most $\beta_{i,j}$ bits of $r_i$ (for all $x\in\X_i,y\in\Y_i,r_i\in R_i$).
+
+
+\cref{prot:multi2psm} is a single-round protocol that allows to securely compute $g_1, \ldots, g_{\NBfs}$ in the presence of semi-honest adversaries. 
+In addition, let $\ell = \sum_{i=1}^{\NBfs}m_i$ (i.e., $\ell$ is the number of output bits to be computed), and let $\D_{\Ac} = \sum_{i=1}^{\NBfs}\sum_{j=1}^{m_i} 2^{\alpha_{i,j}+\beta_{i,j}}$ (i.e., $\D_{\Ac}$ is the sum over all input and randomness domain sizes for party $\Ac$ in computing the above $\ell$ output bits).
+Then, the number of bits that party $\Ac$ needs to send in any execution of the protocol is at most $2\D_{\Ac}$, and the number of bits that party $\Bc$ sends in any execution of the protocol is at most $2\log(\ell)\cdot\D_{\Ac}$.\footnote{If for some $f_i$ it holds that $\size{\Y_i}<\size{\X_i}$, then the communication complexity can be turned to depend on $\size{\Y_i}$ (rather than on $\size{\X_i}$), by switching the roles of the parties (for the block of $f_i$).}
+\end{theorem}
+
+
+\begin{proof}
+We start by explaining how to run \cref{prot:multi2psm} in this scenario. First, we define $\ell$ as in the theorem, and let the functions $f_1,\ldots,f_\ell$ be the Boolean functions that are defined by the natural ordering of the $\ell$ Boolean function, where each $g_i$ for  $i\in\NBfs$ is mapped to an $m_i$ long sequence of Boolean functions. Next, we define the correlation on the random coins to be such that the random coins for each $g_i$ are selected (note that it is possible to sample the random coins 
+$r_i^{\Ac}$, and independently, $r_i^{\Bc}$, and then set $r_i = r_i^{\Ac}\xor r_i^{\Bc}$ for all $i\in[\ell]$). Then, in computing the Boolean function $f_k$, describing the  $j$'th output bit of $g_i$, party $\Ac$ will use the $\alpha_{i,j}$ bits from $x_i$  and the $\beta_{i,j}$  bits (of randomness) from $r_i^{\Ac}$, and party $\Bc$ will use the required (exact number does not affect the proof) bits from $y_i$  and the $\beta_{i,j}$ bits (of randomness) from $r_i^{\Bc}$.
+
+To prove the security of the protocol, we need to show two things. First, we need to show that the computation is correct, i.e., that the distribution over the outputs of the parties is the same as in the ideal setting, where the outputs of all functions $g_1,\ldots, g_{\NBfs}$ are given to the parties. Equivalently, we can show that the distribution over the output bits of $f_1,\ldots,f_{\ell}$ is the same as in the ideal setting. 
+
+
+Note that, by construction, the randomness for the computation of all functions are chosen identically in the protocol as in the ideal world. For $K\in[\ell]$, in the block of messages attributed to $f_k$, computing the $j$'th bit of $g_i(x_i,y_i;r_i)$, denote by $w_k = x_{i,j},r_{i,j}^{\Ac}$ the $\alpha_{i,j}$ bits from $x_i$  and the $\beta_{i,j}$ bits from $r_i^{\Ac}$ that party $\Ac$ uses.  Also denote by $y_{i,j},r_{i,j}^{\Bc}$ the  bits from $y_i$  and the $\beta_{i,j}$ bits from $r_i^{\Bc}$ that party $\Bc$ uses for this block.
+It holds that
+the only pair $\seq{ \sigma_k,\seq{k,\rho_k}}$ for which $\sigma_k = 1$ is the pair that satisfies the following: (1) it is attributed with the computation of $f_k$ (verified by the first element in the message of $\Bc$), and (2)  the pair $\seq{ \sigma_k,\seq{k,\rho_k}}$ is the concatenation of the $w_k$'th message
+of $\Ac$ with the $w_k$'th message
+of $\Bc$ (within the $k$'th message block they both sent). Thus, it holds that $\rho_k = f_k(x_{i,j},y_{i,j};r_{i,j}^{\Ac}\xor r_{i,j}^{\Bc}) = g(x_i,y_i;r_i)[j]$.
+
+Second, we need to show that for an adversary $\adv$ corrupting one of the parties, there exists a simulator, which given the correct output $\seq{z_1, \ldots, z_l}$ (such that $z_k = f_k(x_{i,j}, y_{i,j};r_{i,j})$, according to the notation above) can simulate the view of the adversary $\adv$ in an execution of the protocol. The main part is to show that the shuffled messages as output by the pair-shuffler can be simulated. Indeed, we show that, in fact, these messages can be simulated given only $\seq{z_1, \ldots, z_l}$ (not being required to know the inputs of the corrupted party). To do this, we observe that each block $k$ of messages (attributed with $f_k$) contains exactly the following messages: (1)  $2^{\alpha_{i,j}+\beta_{i,j}}-1$ messages of the form $\seq{ 0,\seq{k,1}}$, (2)  $2^{\alpha_{i,j}+\beta_{i,j}}-1$ messages of the form $\seq{ 0,\seq{k,0}}$, (3)  a single message of the form $\seq{ 1,\seq{k,z_k}}$, and (4)  a single message of the form $\seq{ 0,\seq{k,1-z_k}}$. This is true because for every $1\le j \le2^{\alpha_{i,j}+\beta_{i,j}}$, if the message sent by $\Ac$ for the $t$'th message was $0$ (i.e., $x_{i,j}\neq t$) and the message sent by $\Bc$ for the $j$'th message was $\seq{k,\rho}$, then for the message $2^{\alpha_{i,j}+\beta_{i,j}}+j$, it holds that $\Ac$ sent $0$ and $\Bc$ sent $\seq{k,1-\rho}$.
+
+To simulate, the simulator needs to select the messages for each block as specified above, and select a uniformly random permutation over all messages. In addition, the simulator outputs the input, auxiliary input, and the randomness (if necessary, as sampled by the simulator).
+
+%For the case that the $i$'th function is randomized, and requires $s_i$ random coins (i.e., the parties wish to compute $f'_i(x_i,y_i; r_i)$, where $r_i\in\zo^{s_i}$) we use the standard reduction to the deterministic function $f_i((x_i,r_{i,\Ac}),(y_i,r_{i,\Bc}))=f'_i(x_i,y_i; r_{i,\Ac}\oplus r_{i,\Bc})$, where parties $\Ac,\Bc$ select random $r_\Ac,r_\Bc$ respectively. 
+
+The claim about the number of bits sent by each party immediately follows by construction
+\end{proof}
+
+%\knote{for this part, we dont need a random shuffle, a random circular shift would suffice}
+%\enote{Then, it seems to suffice for our whole construction. Right?
+%} \knote{Depends whether we want a construction with single or many pair shufflers. If we insist on a single shuffler, random circular shift seems insufficient. The question of one vs. many shufflers probably has impact on the cost of building a system realizing our protocols.}\enote{Actually, I am not sure it even works for the single function case. This is because the 1 value on the left hints to the segment where the actual values appear.
+%Think about $f(x,y)$ such that with $y_1$ for  $x\in \sset{x_1,\ldots x_5,x_7, \ldots,x_{10}}$ it holds that $f(x,y_1) = 1$ and $f(x_6,y_1) = 0$ and it holds that with $y_2$ for  $x\in \sset{x_1,\ldots x_{10}}$ it holds that $f(x,y_2) = 0$. Then,  if $\Ac$ has $x_6$ it should not distinguish between $y_1$ and $y_2$, but in the first case it will see a bunch of 1's surrounding the output, while in the case of $y_2$, a it will see a bunch of 0's surrounding the output.
+%}\knote{you are right}
+
+\subsection{A Protocol for Oblivious Transfer 
+in the $\F_{\pshuff}$ Hybrid Model.}\label{sec:OTprot}
+\enote{Currently, we never use this part explicitly.}
+In this section, we use \cref{lem:2psm} to provide a protocol for (a variant of) the (randomized) functionality of random oblivious transfer (ROT). 
+Recall that in the ROT functionality, the functionality chooses $b,M_0,M_1\in \zo$ uniformly at random, where the output of the sender $\Sc$ is the pair $(M_0,M_1)$ and the output of the receiver $\Rc$ is $(b,M_b)$.
+
+
+In our setting, where both parties learn the output of the computation, we will compute a slight variant on this functionality. 
+Specifically, we will let the sender choose $b_\Sc,M_0,M_1\in \zo$ uniformly at random (recall that we work in the semi-honest setting), and we will let the receiver choose $b_\Rc,M_\Rc\in \zo$ uniformly at random.
+The output of this functionality (given to both parties) would then be $M_\Rc\xor M_{b_\Rc\xor b_\Sc}$. 
+
+
+To implement this functionality in the 
+$\F_{\pshuff}$
+model, we will compute the above function using \cref{prot:2psm}, where the receiver $\Rc$ takes the role of party $\Ac$ and the sender takes the role of $\Bc$. By \cref{lem:2psm}, the number of bits sent by each party in such an execution is 4. Note that in order to get string OT for strings of length $\lambda$, we can run $\lambda$ parallel executions of this protocol, letting $b_\Rc$ and $b_\Sc$ be the same in all the $\lambda$ executions.
+
+\subsection{Protocols for Key Agreement and Encryption}\label{sec:keyAgreement}
+\enote{To DO....
+
+}
+To agree on a key, we let the sender $\Sc$ send a block of $2\kappa$ messages, half of them being $0$ and half of them being $1$, in a random order (i.e, uniform selection of the $\kappa$ locations of $0$ messages). The receiver $\Rc$ sends  
+$2\kappa$ of length $\log(2\kappa)$ that form a random permutation over $[2\kappa]$.
+
+As a result of the above, the receiver learns the value at each original location. Thus, by sending $\kappa$ locations that are chosen randomly, we get a uniformly selected $\kappa$-bit key that is known only to the sender and to the receiver, but not to any outside observer.\footnote{To select the locations such that key is uniform, it is possible to first select the key uniformly at random, and then, select random zero-locations for the one bits and random one-locations for the zero bits.}
+\section{Garbling Circuits in the $\F_{\pshuff}$ Hybrid Model}\label{sec:Yaoprot} 
+In this section, we combine the results of previous sections in order to get a complete method for obtaining a single-round, fully secure computation of any efficient function $f$. This method follows the garbling technique of Yao~\cite{Yao87} combined with the point-and-permute technique of \cite{BMR90}. The main tool that we use in our construction that makes it different from standard constructions is (the assumption of the existence of) a pseudorandom generator (PRG) in NC$^0$, allowing parties to jointly evaluate a PRG. We next describe our construction in detail.
+
+\subsection{The Garbling Functionality}
+Let $f$ be a Boolean function, and let $C$ be a circuit computing $f$. Our goal is to allow the parties to jointly compute a garbled (encrypted) version of the circuit $C$, such that, for any inputs, given the appropriate keys for these inputs, one would be able to decrypt the value of the circuit $C$ applied to these inputs. 
+We start by introducing some useful notation. 
+
+Assume, without loss of generality, that the fan-out of all gates in $C$ is bounded by $2$.
+Let the wires of $C$ be the set $\W$ 
+%= \sset{w_1, \ldots, w_\ell}$ 
+and let $G$ be the set of gates in $C$. With each wire $w\in\W$, we attribute two keys: the blue key \textcolor{blue}{$K^{0}_w$}, and the red key \textcolor{red}{$K^{1}_w$}, where the superscript $0$ (resp.~$1$) numerically indicates that the key is blue (resp.~red). These colors are used to allow an evaluator of the garbled circuit to know which ciphertext it should decrypt. However, the color of the key does not represent the actual value of the wire in the evaluation, but rather the actual value XORed with a hidden mask value, denoted $\lambda_w$. Namely, if $\lambda_w = 0$, then \textcolor{blue}{$K^{0}_w$} represents the zero key (i.e., should be used if the true value on this wire is $0$) and \textcolor{red}{$K^{1}_w$}
+represents the one key. Otherwise, if $\lambda_w = 1$, then \textcolor{blue}{$K^{0}_w$} represents the one key and \textcolor{red}{$K^{1}_w$}
+represents the zero key. A crucial point in the construction is that neither any party taking part in constructing the garbled circuit nor any party evaluating the circuit should ever learn the value of $\lambda_w$ for any wire $w\in \W$, unless it is an input wire in the control of that party, or an output wire.
+
+Let us describe the structure of the garbled version $\GC$ of $C$. In our final construction, the idea is to compute and reveal the garbled circuit (together with the keys that are attributed with the actual inputs) in a single shot. However, in the coming presentation, we will follow the standard way to present garbled circuits, where  the garbled circuit is revealed at preliminary stage, and later, upon receiving the inputs for the computation, the appropriate keys are also revealed. We will thus indicate which parts of the computation are (i) remain hidden at all times, (ii) revealed in a preliminary stage, or (iii) revealed after the parties obtain their respective inputs.
+ 
+\begin{description}
+\item[Wires:] As described above, each wire $w$ will be attributed with the two keys \textcolor{blue}{$K^{0}_w$}, \textcolor{red}{$K^{1}_w$} (the color of the wire in a specific computation is a Boolean value, which is also referred to as the external value of the wire), and with the mask $\lambda_w$. Given a key $K_w$, it should be possible to extract the color of the key, we will do this by letting the least-significant bit of $K_w$ indicate its color. At the initial state, all of the above need to remain hidden from all parties, except for the mask $\lambda_{w_\out}$ of the output wire of the circuit, ${w_\out}$. In addition, the value of $\lambda_w$ for each input wire $w$ is revealed (in a preliminary stage) to the party holding that specific input. After each party learns its input, it should also learn the appropriate keys for all input wires it holds (specifically, exactly one key for every input wire).
+
+\item[Gates:] 
+Each gate $g$ in the circuit $C$, with in going wires $\alpha, \beta$ and with an out going wires $\gamma, \delta$,  will be encoded as a four-row table, where each row has two columns. The first column is attributed with the (encrypted) keys for the wire $\lambda$, and the second column is attributed with the (encrypted) keys for the wire $\delta$.  Each row is attributed with a key and a pair of colors. In this way, for colors $c_\alpha, c_\beta \in \zo$, the keys \textcolor{magenta}{$K^{c_\alpha}_\alpha$}, \textcolor{magenta}{$K^{c_\beta}_\beta$} (we use the purple color to indicate it could either be red or blue, i.e., $c_\alpha$ and $c_\beta$ vary) will be used to encrypt the key \textcolor{magenta}{$K_\gamma^{c_\gamma}$}, where $c_\gamma := \lambda_\gamma\xor g(c_\alpha\xor\lambda_\alpha, c_\beta\xor\lambda_\beta)$, and (if needed) in addition, the key \textcolor{magenta}{$K_\delta^{c_\delta}$}, where $c_\delta := \lambda_\delta\xor g(c_\alpha\xor\lambda_\alpha, c_\beta\xor\lambda_\beta)$. The order of the rows is known to all in advance (specifically, the \textcolor{blue}{00} row will be the first, the \textcolor{blue}{0}\textcolor{red}{1} row will be second, the \textcolor{red}{1}\textcolor{blue}{0} row will be third, and the the \textcolor{red}{11} row will be the last). Thus, given two keys for wires $\alpha$ and $\beta$ together with their colors (which, in our case, can be extracted from the keys), it is clear which row in the table of $g$ they can be used to decrypt. 
+
+Finally, for the encryption, we use a PRG with a stretch of at least $8(\kappa+1)$ (for a seed of length $\kappa$). In particular, we partition the output of the PRG into 8 $\kappa$-long intervals, and we use the first four intervals as one-time pads to encrypt the four $\gamma$ related keys (i.e., those of the first column), and the next four intervals to encrypt the four $\delta$ related keys.
+
+\end{description}
+We next define the $\GC$ functionality for the case of $n$ parties $\Pc_1, \ldots, \Pc_n$.
+\begin{definition}[The $\GC$ functionality.]\label{def:Fgc}\
+\begin{description}
+\item[Common inputs:] A circuit $C$ (with a predetermined ordering on the gates and on the wires of $C$), a security parameter $1^{\kappa}$, and a PRG $\prg$.
+
+\item[Private inputs:] Each party $\Pc_i$ for $i\in[n]$ holds a private input $x_i\in \zo^{s_i}$.
+
+\item[Computation:]
+\begin{description}
+    \item [Garbling wires:] For each $w\in\W$ sample two strings $K_0,K_1\from\zo^\kappa$, and set {$K^{0}_w = K_0\concat 0$} and {$K^{1}_w = K_1\concat 1$}. In addition, sample the mask $\lambda_w\from\zo$ (for the output wire $w_\out$ set $\lambda{w_\out}=0$).
+    \item [Garbling gates:] 
+    For each gate $g$ (we abuse notation and use $g$ to denote both the index of the gate and the operation of the gate), compute the garbled table $T_g$ as follows.
+      Let $\prg$ be an easy PRG with stretch $8(\kappa+1)$ (where $\kappa$ is the length of the seed). Let $\widehat\prg$ be the algorithm that on input $s\in\zo^{\kappa+1}$, returns $\prg(s')$ where $s'$ is the $\kappa$-long prefix of $s$ (the $\kappa$ most significant bits of $s$). Divide the output of $\widehat\prg$ on seed $s$ into $8$ ($\kappa+1$)-long intervals and denote by $\widehat\prg(s)_i$ the $i$'th such interval (for $i\in\sset{1,\ldots,8}$). 
+ 
+ Let the input wires of $g$ be denoted $\alpha,\beta$ and let the output wires of $g$ be denoted $\gamma$ and $\delta$ (recall that the fan-out of every gate is at most 2). \cref{table:garbledGate} defines the resulting two-column table, the first column for wire $\gamma$, and the second column for wire $\delta$.
+
+\end{description}
+
+\item[Output:] Upon receiving the inputs of all parties, the functionality computes the garbled circuit $\G_C$ as described above and outputs the following:
+\begin{enumerate}
+    \item The garbled table $T_g$ for each gate $g$ in the circuit (as described in \cref{table:garbledGate}). 
+    \item The key $K_w^{c_w}$ for every input wire $w\in\W$, as determined by $\lambda_w$ and the inputs $x_1,\ldots,x_n$. Specifically, for every input wire $w\in\W$ that is attributed to the input bit $b = x_i[j]$ (for some $i\in [n]$ and $j\in [s_i]$), the functionality sets $c_w= b\xor\lambda_w$.
+\end{enumerate}
+\end{description}
+\begin{table}[h!]
+\centering
+\begin{tabular}{ |c|c| } 
+ \hline
+ Wire $\gamma$ & Wire $\delta$ (if necessary)  \\ 
+ $\widehat\prg(\textcolor{blue}{K_{\alpha}^{0}})_1 \xor \widehat\prg(\textcolor{blue}{K_{\beta}^{0}})_1 \xor \textcolor{magenta}{K_\gamma^{\lambda_\gamma\xor g(\lambda_\alpha, \lambda_\beta)}}$ & $\widehat\prg(\textcolor{blue}{K_{\alpha}^{0}})_5 \xor \widehat\prg(\textcolor{blue}{K_{\beta}^{0}})_5 \xor \textcolor{magenta}{K_\delta^{\lambda_\delta\xor g(\lambda_\alpha, \lambda_\beta)}}$  \\ 
+ $\widehat\prg(\textcolor{blue}{K_{\alpha}^{0}})_2 \xor \widehat\prg(\textcolor{red}{K_{\beta}^{1}})_2 \xor \textcolor{magenta}{K_\gamma^{\lambda_\gamma\xor g(\lambda_\alpha, 1\xor\lambda_\beta)}}$ & $\widehat\prg(\textcolor{blue}{K_{\alpha}^{0}})_6 \xor \widehat\prg(\textcolor{red}{K_{\beta}^{1}})_6 \xor \textcolor{magenta}{K_\delta^{\lambda_\delta\xor g(\lambda_\alpha, 1\xor\lambda_\beta)}}$  \\
+  $\widehat\prg(\textcolor{red}{K_{\alpha}^{1}})_3 \xor \widehat\prg(\textcolor{blue}{K_{\beta}^{0}})_3 \xor \textcolor{magenta}{K_\gamma^{\lambda_\gamma\xor g(1\xor\lambda_\alpha, \lambda_\beta)}}$ & $\widehat\prg(\textcolor{red}{K_{\alpha}^{1}})_7 \xor \widehat\prg(\textcolor{blue}{K_{\beta}^{0}})_7 \xor \textcolor{magenta}{K_\delta^{\lambda_\delta\xor g(1\xor\lambda_\alpha, \lambda_\beta)}}$  \\
+   $\widehat\prg(\textcolor{red}{K_{\alpha}^{1}})_4 \xor \widehat\prg(\textcolor{red}{K_{\beta}^{1}})_4 \xor \textcolor{magenta}{K_\gamma^{\lambda_\gamma\xor g(1\xor\lambda_\alpha, 1\xor\lambda_\beta)}}$ & $\widehat\prg(\textcolor{red}{K_{\alpha}^{1}})_8 \xor \widehat\prg(\textcolor{red}{K_{\beta}^{1}})_8 \xor \textcolor{magenta}{K_\delta^{\lambda_\delta\xor g(1\xor\lambda_\alpha, 1\xor\lambda_\beta)}}$  \\
+ \hline
+\end{tabular}
+\caption{The garbled table for gate $g$ (with possibly two) out going wires $\lambda$ and $\delta$.}\label{table:garbledGate}
+\end{table}
+
+\end{definition}
+
+
+
+\begin{algorithm}[An algorithm for computing the output of $f$ from $\G_C$.]\label{alg:decode}
+Let $\tau$ be the output of functionality $\GC$, containing a garbled table $T_g$ for each gate $g$ in the circuit $C$, and a key $K_w^{c_w}$ for every input wire $w\in\W$.
+In addition, let $\prg$ be the PRG used in construction of $\tau$.
+
+The following algorithm reveals the set of active keys in the garbled circuit in a bottom-up manner. The starting point of the algorithm is the set $S_0$ of all input wire keys, which is given as input. Now, given the set $S_t$ of known keys, let the set $G_t$ be the set of all gates $g$, with in-going wires $\alpha,\beta$ of which keys are in $S_t$ and with out-going wires $\gamma,\delta$ of which keys are not in $S_t$ (note that either both key were previously revealed or neither one was).
+
+Set $S_{t+1}=S_t$ and add it all the active keys that are revealed as follows. For each gate in $G_t$, let $K_\alpha^{c_\alpha} = K_\alpha \concat {c_\alpha}$ and $K_\beta^{c_\beta } = K_\beta  \concat {c_\beta }$ be the keys for wires $\alpha$ and $\beta$, respectively. By construction of the garbled circuit $\G_C$, the appropriate active keys for wires $\gamma$ and $\delta$ are encrypted in the $c_\alpha,c_\beta$ row of $T_g$. Thus, we set $K_\gamma^{c_\gamma} = \widehat\prg(K_\alpha)\xor \widehat\prg(K_\beta)\xor T_g[c_\alpha,c_\beta][0]$ and $K_\delta^{c_\delta} = \widehat\prg(K_\alpha)\xor \widehat\prg(K_\beta)\xor T_g[c_\alpha,c_\beta][1]$. 
+
+The algorithm halts if $S_{t+1}$ contains a key for every wire in the circuit. In this case, let the active key for the output wire ${w_\out}$ be $K_{w_\out}^{c_{w_\out}} = K_{w_\out} \concat {c_{w_\out}}$. The output of the algorithm is ${c_{w_\out}}$.
+\end{algorithm}
+
+\begin{lemma}[correctness of $\GC$]\label{lem:gcCorrect}
+Let $f$ be an $n$-ary function, and let the circuit $C$ be a Boolean circuit computing $f$. Let $\prg$ be a PRG, and let $x_1,\ldots,x_n$ be inputs for $f$, such that, $x_i\in \zo^{s_i}$. 
+Let $\tau$ be the output of functionality $\GC$ on inputs $C$ and $x_1,\ldots,x_n$, then the output of \cref{alg:decode} on $\tau$ is $f(x_1,\ldots,x_n)$. 
+\end{lemma}
+
+\begin{proof}
+We prove that for every wire $w$ in $\W$ it holds that for the active key $K_{w}^{c_{w}}$ that is revealed by \cref{alg:decode}, it holds that the value $c_w\xor\lambda_w$ is the actual value of the wire $w$ in a computation of the original circuit $C$ on $x_1,\ldots,x_n$. 
+
+This is proved by induction on $t$, and by showing that the above holds for all wires that belong to $S_t$. For $t=1$, this is true by construction for input wires by construction of the output of the $\GC$ functionality (see \cref{def:Fgc}).
+Assume that the above holds for all active keys that are in $S_t$ (i.e., that were revealed within the first $t$ steps of the algorithm). Let $g$ be a gate of which outgoing wires get revealed in the $t+1$ step of the algorithm, i.e., $g$'s in-going wires $\alpha,\beta$ have keys that are in $S_t$ and the key  for $g$'s out-going wires $\gamma,\delta$ are not in $S_t$.   
+
+Let $K_\gamma^{c_\gamma} = K_\gamma\xor{c_\gamma}$ and $K_\delta^{c_\delta} = K_\delta\xor{c_\delta}$ be the active keys chosen by the \cref{alg:decode} for wires $\gamma$ and $\delta$ respectively.  We need to show that  ${c_\gamma}\xor \lambda_\gamma$ and ${c_\delta}\xor \lambda_\delta$ are the actual values of wires $\gamma$ and $\delta$ in the computation of $C$ on $x_1,\ldots,x_n$, respectively. By symmetry, it suffices to consider ${c_\gamma}\xor \lambda_\gamma$. Indeed, since $K_\gamma^{c_\gamma} = \widehat\prg(K_\alpha)\xor \widehat\prg(K_\beta)\xor T_g[c_\alpha,c_\beta][0]$, it follows from \cref{table:garbledGate} that 
+$c_\gamma \xor \lambda_\gamma = g(c_\alpha\xor\lambda_\alpha,c_\beta\xor\lambda_\beta)$. By the induction hypothesis on the keys $K_\alpha^{c_\alpha}$ $K_\beta^{c_\beta}$, the latter term is the actual value of wire $\gamma$.
+\end{proof}
+\begin{lemma}[security of $\GC$]\label{lem:gcPrivate}
+\enote{To Do.}
+\end{lemma}
+
+
+
+
+\subsection{Computing $\G_C$ in the $\F_{\pshuff}$ Hybrid Model}
+To compute the garbled circuit, we will use (variants of) the ROT functionality, described in \cref{sec:OTprot}.
+
+%Recall that in our setting, where both parties learn the output of the computation, we will let the sender choose $b_\Sc,K_0,K_1\in \zo$ uniformly at random, and we will let the receiver choose $b_\Rc,K_\Rc\in \zo$ uniformly at random.
+%The output of this functionality (given to both parties) would then be 
+
+We assume that an ordering on the circuit's gates and wires can be locally computed by the parties, and thus, they agree on a numbering for gates and a numbering for wires. For a wire $w\in\W$, we let party $\Ac$ (resp., party $\Bc$) select $(K_w^{\Ac,0},K_w^{\Ac,1},\lambda_{w}^{\Ac}) \in \zo^{\kappa+1}\times\zo^{\kappa+1}\times\zo$ (resp., $K_w^{\Bc,0},K_w^{\Bc,1},\lambda_{w}^{\Bc}$) uniformly at random, under the following requirements:
+\begin{itemize}
+    \item The lsb's of $K_w^{\Ac,0}$ and of  $K_w^{\Bc,0}$ are $0$.
+    \item The lsb of $K_w^{\Ac,1}$ is $0$ and the lsb of $K_w^{\Bc,1}$ is $1$.
+    \item If $w$ is an input wire of $\Ac$ (resp., $\Bc$), then $\lambda_{w}^{\Bc}$ (resp., $\lambda_{w}^{\Ac}$) is set to $0$. 
+    \item For the output wire $w_\out$, we set $\lambda_{w_{\out}}^{\Ac}$ and $\lambda_{w_{\out}}^{\Bc}$ to $0$.
+\end{itemize}
+We let 
+\begin{enumerate}
+    \item \textcolor{blue}{$K_w^{0}$} $= K_w^{\Ac,0}\xor K_w^{\Bc,0}$ (note that the lsb of \textcolor{blue}{$K_w^{0}$} is $0$),
+    \item \textcolor{red}{$K_w^{1}$} $= K_w^{\Ac,1}\xor K_w^{\Bc,1}$  (note that the lsb of \textcolor{red}{$K_w^{1}$} is $1$),
+    \item $\lambda_w = \lambda_{w}^{\Ac}\xor \lambda_{w}^{\Bc}$.
+\end{enumerate}
+ For a gate $g$ with input wires  $\alpha,\beta$ and output wires  $\gamma$ and $\delta$, the garbling of $g$ is done as specified in  \cref{table:garbledGate} (resulting in a two-column table, where the first column is for wire $\gamma$, and the second column is for wire $\delta$).
+
+
+
+
+
+\subsection{Joint Computation of the Garbled Tables}
+The idea is for each row in the above tables to be computed bit by bit. Since the length of the a table is $8\kappa$, in this way each gate is computed by $8\kappa$ circuits. A crucial point is that all gates can be computed in parallel, and all $8\kappa$ circuits for each gate can also be computed in parallel. Furthermore, as we are using a small locality PRG, each single bit in the table depends only on a constant (independent of $\kappa$) number of input bits.     In particular Alice's input to the computation of each bit in the table is constant, and thus, by \cref{lem:2psm} can be computed (in a single round) by \cref{prot:2psm}.  Furthermore, since all computations can be done in parallel, by \cref{thm:multi2psm} the whole garbled circuit can be computed in a single round, where each party sends $O(\kappa\cdot\size{C})$ bits.
+
+\subsection{Revealing the Appropriate Input Keys}
+For the parties to be able to compute the function $f$, given the garbled gates, they need to learn the appropriate key for every input wire $w$. That is, if $w$ is the wire representing input bit $x_j$, then parties need to learn \textcolor{magenta}{$K_w^{c_w}$}, where $c_w := \lambda_w\xor x_j$. Assume without loss of generality that $w$ is an input wire of $\Ac$, then $\lambda_{w}^{\Bc} =0$. \ie $\lambda_{w}=\lambda_{w}^{\Ac}$. Thus, we need to compute the function where $\Ac$'s input is $b,K_w^{\Ac,b}$ and $\Bc$'s input is $K_w^{\Bc,0}, K_w^{\Bc,1}$, and the output is $K_w^{\Ac,b}\xor K_w^{\Bc,b}$, which is \textcolor{magenta}{$K_w^b$}. Note that while $\Bc$ should not learn $\lambda_{w}$ from the computation, both parties learn the color of the output, i.e., the value of $b$. This is because the least significant bit of \textcolor{magenta}{$K_w^b$} is $b$. As before, the computation of this function is done by computing it bit by bit (in parallel).
+
+\subsection{Putting it all Together}
+We now explain how to compute any function $f$ by a single round two-party protocol in the face of semi-honest, computationally bounded adversaries. Recall that given a security parameter $\kappa$, a circuit $C$, and inputs $x$ and $y$ for parties $\Ac$ and $\Bc$, respectively,   the $\GC$ functoinality outputs the following: (i) the garbled table $T_g$ for each gate $g$ in the circuit and (ii) the key $K_w$ for every input wire $w\in\W$, as determined by $\lambda_w$ and the inputs $x,y$. We stress that $\GC$ is not required to reveal the color of the input keys (as the lsb of the key defines its color) or $\lambda_{w_\out}$ (as it is a priory set to zero).  
+
+\enote{ToDo:
+\begin{enumerate}
+    \item Proof of correctness
+    \item proof of security.
+    
+\end{enumerate}}
+
+\section{A Single-Round Protocol for any  Logarithmic Number of Parties}
+
+In this section, we show how to extend the above results for two-party functions to any $\PartN$-party function. Specifically, our protocol has polynomial complexities as long as the sum of domain sizes is logarithmic (in the security parameter), and in particular $\PartN$ must be logarithmic in the security parameter.
+
+
+
+
+
+
+
+
+
+
+\section{Malicious Two-Party Protocols}
+
+Here are some ideas.
+\subsection{The Cut and Choose Methodology in the $\F_{\pshuff}$ Hybrid Model.}\label{sec:CaC}
+
+ Use a variant of the key-agreement protocol and the encryption protocol suggested in \cref{sec:keyAgreement} to obtain a cut and choose method in our setting. The basic idea is as follows. Consider a case where two parties wish to compute a no-input randomized function $f$, without revealing their random coins, and at the same time, to verify that the function was computed correctly. 
+ The cut and choose methodology suggest the following solution, compute many instances of $f$, each with independent coins. Then, select a linear size subset of the instances and prove they were all computed correctly, by revealing the randomness that lead to the computation. Finally, for the remaining instances, of which randomness remains hidden, conclude that the vast majority of them were computed correctly.\footnote{Sometimes, as will be in our case, it is enough to conclude that a constant fraction of the remaining instances were computed correctly.}   
+ 
+ Thus, if it is the case that it is enough to compute the function many times, such that, it holds that the majority of the computations were done correctly, and in addition, the random coins remain hidden, then cut and choose methodology is useful. We will use these ideas to obtain message authentication codes (MAC) for the computations.  
+ Use CaC for ramdomized computations that do not depend on the inputs.
+\begin{enumerate}
+    \item Use encryption to get cut and choose. Use CaC for ramdomized computations that do not depend on the inputs.
+    \item Use One directional Yao (Alice garbles, Bob computes). The output could be a key (for authentication).
+    
+    \item Use MACs.
+    \item Compute a function in both directions.
+\end{enumerate}
+

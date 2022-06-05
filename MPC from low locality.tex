@@ -1,0 +1,85 @@
+\def\IsDraft{} % set for draft version
+
+\documentclass[11pt]{article}
+\usepackage{amsfonts,amsmath,amssymb,amsthm,boxedminipage,color,url,fullpage}
+\usepackage{enumerate,paralist}
+\usepackage[numbers]{natbib} % \citet{foo} -> Foo et al. [5]
+\usepackage[pdfstartview=FitH,colorlinks,linkcolor=blue,filecolor=blue,citecolor=blue,urlcolor=blue]{hyperref} 
+\usepackage[labelfont=bf]{caption}
+\usepackage{aliascnt}
+\usepackage{cleveref}
+\usepackage{xspace}
+\usepackage{relsize}
+\usepackage{graphics}
+
+%\usepackage{bbold}
+\usepackage{float}
+\floatstyle{boxed}
+\restylefloat{figure}
+
+\input{macros}
+
+%\newcommand{\gv}{\mathbf{gv}} 
+
+\newcommand{\NBfs}{t}
+\newcommand{\pshuff}{\operatorname{Pair-Suffle}\xspace}
+\newcommand{\pk}{\secParam}
+\newcommand{\Po}{\overline{\Pc}}
+
+%\newcommand{\pk}{\kappa}
+\newcommand{\Knote}[1]{\authnote{Kobbi}{#1}}
+\newcommand{\Enote}[1]{\authnote{Eran}{#1}}
+
+\newcommand{\knote}{\Knote}
+\newcommand{\enote}{\Enote}
+
+\title{On the Power of Computing with Shuffles
+%MPC in the Pair-Shuffle Model
+%Paradigm for MPC From Low Locality PRGs
+\Draft{\\{\small \sc Working Draft: Please Please Please Do Not Distribute}}}
+\author{}
+
+\begin{document}
+	\sloppy
+	  \maketitle
+
+\begin{abstract}
+\end{abstract}
+
+% \Tableofcontents
+
+\section{Introduction}
+
+In 2006, Ishai, Kushilevitz, Ostrovsky, and Sahai introduced a model where parties communicate via a channel that shuffles their messages at random~\cite{}. Among other results, they showed that every two parties $\Ac,\Bc$ can use the shuffle to agree on a secret key, and hence create a private channel. Hence, any secure protocol assuming private channels can be implemented with access to a shuffling functionality, with the addition of one round. As an example, combining the protocol if Ishai et al.\ with the two-round protocol of Applebaum, Brakersky, and Tsabary~\cite{} yields a secure protocol for the information theoretic, honest majority, semi-honest setting.
+
+Recent years have seen renewed interest in shuffling based protocols, in the context of  differential privacy~\cite{}. Most of the work on the shuffle model of differential privacy focuses on the one-round setting, yielding protocols which improve on what can be done in the local model of differential privacy, and in many cases with noise levels which are similar to what can be achieved with a trusted curator~\cite{}. 
+
+For two-round shuffle model protocols, 
+\begin{enumerate}
+    \item Beimal et al showed two-round semi-honest MPC with honest majority from shuffle. \cite{}
+    \enote{I would add: We show a similar result for the pair-shuffle model, by showing how to implement secure channels in a single round of computation.}
+    \item we consider a variant of the shuffle: pair shuffle. Upon receiving $\ell$ messages $(a_1,\ldots,a_\ell)$ from $\Ac$ and $\ell$ messages $(b_1,\ldots,b_\ell)$ from $\Bc$, the pair shuffle functionality pairs messages $a_i$ and $b_i$ to get $((a_1,b_1),\ldots,(a_\ell,b_\ell))$ and then randomly permutes this list of pairs.
+    \item our first result is akin to a construction by FKN in the simultaneous messages model \cite{}. In PSM, $\Ac$ and $\Bc$ share a common random string and each sends a message to $\Cc$ to allow $\Cc$ compute a function of their inputs but no more. We show a one-round protocol for computing any function in one-round. In a sense, the pair shuffle replaces the shared random string of PSM to correlate the parties' messages. However, in the FKN construction there is no security for $\Ac$ and $\Bc$ if the messages they send are revealed to each other. The pair shuffle hides the randomness from both parties, and our protocol is secure although the communication is revealed to both $\Ac$ and $\Bc$.
+    \enote{I would say that the pair shuffle can be used to hide the randomness (I mean to say that this is not its inbuilt feature). And also, the communication is revealed to both $\Ac$ and $\Bc$ (without its pattern).}
+    \item we next show how to construct efficient two party secure protocols in the computational setting. Our construction follows Yao's garbled circuit construction where we implement encryption using ``easy PRGs''.
+    \item The idea of using an ''easy PRG" for MPC was introduced by \cite{}
+    \enote{I would add:
+    We generalize the construction to any constant number of parties (or even logarithmic in the security parameter), with semi-honest security and a dishonest majority.}
+    \item state result informally
+\end{enumerate} 
+\subsection{Preliminary definitions}
+For $n\in\N$ let $[n] = \sset{1, \ldots, n}$.
+\enote{Secure computation. Real~as.~Ideal.}
+\enote{Pseudo-random generator.}
+
+\input{MPCfromPshuffle}
+
+
+\bibliographystyle{abbrvnat}
+\bibliography{bib}
+\end{document}
+
+
+
+
+
